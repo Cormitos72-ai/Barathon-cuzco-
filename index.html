@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Barathon Cusco</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #f0c040;
+    --accent2: #e87040;
+    --text: #f0eff8;
+    --muted: #6b6a80;
+    --done: #1e2e1e;
+    --done-border: #3a5a3a;
+    --done-text: #70b870;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* SETUP */
+#setup { min-height: 100vh; display: flex; flex-direction: column; padding: 32px 22px 40px; }
+.logo { font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 2.6rem; letter-spacing: -0.05em; line-height: 1; margin-bottom: 4px; }
+.logo span { color: var(–accent); }
+.city-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(240,192,64,0.1); border: 1px solid rgba(240,192,64,0.22); border-radius: 99px; padding: 4px 12px; font-family: ‘Syne’, sans-serif; font-size: 0.72rem; font-weight: 700; color: var(–accent); margin-bottom: 32px; letter-spacing: 0.04em; }
+.sec-label { font-family: ‘Syne’, sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(–muted); margin-bottom: 14px; }
+.setup-timeline { position: relative; padding-left: 36px; margin-bottom: 20px; }
+.setup-timeline::before { content: ‘’; position: absolute; left: 11px; top: 16px; bottom: 16px; width: 2px; background: var(–border); border-radius: 99px; }
+.setup-item { position: relative; margin-bottom: 10px; animation: slideIn 0.2s ease both; }
+.setup-dot { position: absolute; left: -28px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(–border); border: 2px solid var(–surface); transition: background 0.2s; z-index: 1; }
+.setup-item.filled .setup-dot { background: var(–accent); }
+.setup-row { display: flex; align-items: center; gap: 10px; background: var(–card); border: 1px solid var(–border); border-radius: 14px; padding: 11px 13px; }
+.setup-num { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 0.78rem; color: var(–accent); min-width: 20px; }
+.setup-row input { flex: 1; background: transparent; border: none; outline: none; color: var(–text); font-family: ‘DM Sans’, sans-serif; font-size: 0.92rem; }
+.setup-row input::placeholder { color: var(–muted); }
+.del-btn { background: none; border: none; color: var(–muted); cursor: pointer; font-size: 1rem; padding: 4px; line-height: 1; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+.add-btn { display: flex; align-items: center; gap: 8px; background: none; border: 1.5px dashed var(–border); border-radius: 12px; padding: 11px 16px; color: var(–muted); font-family: ‘DM Sans’, sans-serif; font-size: 0.88rem; cursor: pointer; width: calc(100% - 36px); margin-left: 36px; margin-bottom: 32px; }
+.start-btn { background: var(–accent); color: #0a0a0f; border: none; border-radius: 16px; padding: 18px; font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; margin-top: auto; letter-spacing: 0.01em; }
+.start-btn:disabled { opacity: 0.3; }
+
+/* MARATHON */
+#marathon { display: none; min-height: 100vh; flex-direction: column; padding-bottom: 40px; }
+.m-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 22px 0; margin-bottom: 20px; }
+.m-logo { font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; }
+.m-logo span { color: var(–accent); }
+.m-timer { font-family: ‘Syne’, sans-serif; font-weight: 600; font-size: 0.78rem; color: var(–muted); background: var(–surface); padding: 5px 10px; border-radius: 99px; border: 1px solid var(–border); }
+.m-progress { padding: 0 22px 20px; }
+.m-prog-info { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.m-prog-label { font-family: ‘Syne’, sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(–muted); }
+.m-prog-count { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 0.9rem; }
+.m-prog-count em { color: var(–accent); font-style: normal; }
+.m-prog-track { height: 3px; background: var(–border); border-radius: 99px; overflow: hidden; }
+.m-prog-fill { height: 100%; background: linear-gradient(90deg, var(–accent2), var(–accent)); border-radius: 99px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.m-current { padding: 0 22px 24px; }
+.m-current-label { font-family: ‘Syne’, sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(–accent); margin-bottom: 8px; }
+.m-card { background: var(–card); border: 1px solid rgba(240,192,64,0.2); border-radius: 22px; padding: 20px; position: relative; overflow: hidden; animation: cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes cardIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.m-card::before { content: ‘’; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, rgba(240,192,64,0.07) 0%, transparent 55%); pointer-events: none; }
+.m-card-bg-num { position: absolute; top: 10px; right: 16px; font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 4.5rem; line-height: 1; color: var(–accent); opacity: 0.12; user-select: none; }
+.m-bar-name { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 1.55rem; line-height: 1.1; letter-spacing: -0.02em; padding-right: 54px; margin-bottom: 6px; color: var(–text); display: block; text-decoration: none; }
+.m-gps-hint { font-size: 0.73rem; color: var(–muted); margin-bottom: 16px; display: flex; align-items: center; gap: 5px; }
+.m-checkin { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(–accent); color: #0a0a0f; border: none; border-radius: 13px; padding: 14px; font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 0.92rem; cursor: pointer; width: 100%; }
+
+/* TIMELINE */
+.m-timeline-wrap { padding: 0 22px; }
+.m-tl-label { font-family: ‘Syne’, sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(–muted); margin-bottom: 16px; }
+.m-timeline { position: relative; padding-left: 32px; }
+.m-timeline::before { content: ‘’; position: absolute; left: 10px; top: 10px; bottom: 10px; width: 2px; background: var(–border); border-radius: 99px; }
+.m-timeline-filled { position: absolute; left: 10px; top: 10px; width: 2px; background: linear-gradient(180deg, var(–accent2), var(–accent)); border-radius: 99px; transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1); z-index: 1; }
+.m-tl-item { position: relative; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+.m-tl-dot { position: absolute; left: -24px; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(–border); background: var(–bg); z-index: 2; transition: all 0.3s ease; flex-shrink: 0; }
+.m-tl-item.done .m-tl-dot { background: var(–done-text); border-color: var(–done-text); box-shadow: 0 0 0 4px rgba(112,184,112,0.15); }
+.m-tl-item.active .m-tl-dot { background: var(–accent); border-color: var(–accent); box-shadow: 0 0 0 4px rgba(240,192,64,0.2); animation: pulse 2s infinite; }
+.m-tl-item.locked .m-tl-dot { background: var(–surface); border-color: var(–border); }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(240,192,64,0.2); } 50% { box-shadow: 0 0 0 8px rgba(240,192,64,0.06); } }
+.m-tl-content { flex: 1; padding: 10px 14px; border-radius: 14px; border: 1px solid transparent; transition: all 0.3s ease; }
+.m-tl-item.done .m-tl-content { background: var(–done); border-color: var(–done-border); }
+.m-tl-item.active .m-tl-content { background: var(–card); border-color: rgba(240,192,64,0.3); }
+.m-tl-item.locked .m-tl-content { background: var(–surface); opacity: 0.4; }
+.m-tl-num { font-size: 0.68rem; font-family: ‘Syne’, sans-serif; font-weight: 600; margin-bottom: 2px; color: var(–muted); }
+.m-tl-item.done .m-tl-num { color: var(–done-text); }
+.m-tl-item.active .m-tl-num { color: var(–accent); }
+.m-tl-name { font-family: ‘Syne’, sans-serif; font-weight: 600; font-size: 0.9rem; color: var(–text); text-decoration: none; display: block; }
+.m-tl-item.done .m-tl-name { color: var(–done-text); text-decoration: line-through; text-decoration-color: rgba(112,184,112,0.4); }
+.m-tl-item.locked .m-tl-name { color: var(–muted); pointer-events: none; }
+
+/* CELEBRATION */
+#celebration { display: none; position: fixed; inset: 0; background: rgba(8,8,14,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 36px 28px; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.cel-emoji { font-size: 3.5rem; margin-bottom: 16px; animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounceIn { from { transform: scale(0) rotate(-10deg); } to { transform: scale(1) rotate(0); } }
+.cel-title { font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 20px; line-height: 1.1; }
+.cel-title span { color: var(–accent); }
+.cel-next-label { font-family: ‘Syne’, sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(–muted); margin-bottom: 8px; }
+.cel-next-name { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 1.2rem; color: var(–text); margin-bottom: 24px; padding: 14px 20px; background: var(–card); border-radius: 14px; border: 1px solid rgba(240,192,64,0.2); width: 100%; text-decoration: none; display: block; }
+.cel-btn { background: var(–accent); color: #0a0a0f; border: none; border-radius: 14px; padding: 15px 32px; font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 0.92rem; cursor: pointer; width: 100%; }
+
+/* FINISH */
+#finish { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; }
+.fin-trophy { font-size: 4.5rem; margin-bottom: 20px; animation: bounceIn 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.2s both; }
+.fin-title { font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 2.2rem; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 8px; }
+.fin-title span { color: var(–accent); }
+.fin-sub { color: var(–muted); font-size: 0.9rem; margin-bottom: 10px; }
+.fin-count { font-family: ‘Syne’, sans-serif; font-weight: 800; font-size: 3.5rem; color: var(–accent); line-height: 1; margin-bottom: 4px; }
+.fin-count-label { color: var(–muted); font-size: 0.85rem; margin-bottom: 8px; }
+.fin-time { font-family: ‘Syne’, sans-serif; font-weight: 600; font-size: 0.9rem; color: var(–muted); margin-bottom: 36px; }
+.fin-time strong { color: var(–text); }
+.restart-btn { background: transparent; border: 1.5px solid var(–border); color: var(–text); border-radius: 14px; padding: 14px 28px; font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
+
+.confetti-piece { position: fixed; width: 7px; height: 7px; border-radius: 2px; animation: confettiFall linear forwards; pointer-events: none; z-index: 200; }
+@keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+</style>
+
+</head>
+<body>
+
+<!-- SETUP -->
+
+<div id="setup">
+  <div class="logo">bara<span>thon</span></div>
+  <div class="city-pill">📍 Cusco, Pérou</div>
+  <div class="sec-label">Parcours du soir</div>
+  <div class="setup-timeline" id="setupTimeline"></div>
+  <button class="add-btn" onclick="addBar()">＋ &nbsp;Ajouter un bar</button>
+  <button class="start-btn" id="startBtn" onclick="startMarathon()">Lancer le barathon →</button>
+</div>
+
+<!-- MARATHON -->
+
+<div id="marathon">
+  <div class="m-header">
+    <div class="m-logo">bara<span>thon</span></div>
+    <div class="m-timer" id="mTimer">00:00</div>
+  </div>
+  <div class="m-progress">
+    <div class="m-prog-info">
+      <span class="m-prog-label">Progression</span>
+      <span class="m-prog-count" id="mProgCount"><em>0</em>/7</span>
+    </div>
+    <div class="m-prog-track"><div class="m-prog-fill" id="mProgFill" style="width:0%"></div></div>
+  </div>
+  <div class="m-current">
+    <div class="m-current-label">📍 Stop actuel</div>
+    <div class="m-card" id="mCard">
+      <div class="m-card-bg-num" id="mCardNum">1</div>
+      <a class="m-bar-name" id="mBarName" href="#">—</a>
+      <div class="m-gps-hint">🗺️ Appuie sur le nom pour ouvrir Maps</div>
+      <button class="m-checkin" onclick="checkIn()">✓ &nbsp;Check-in ici</button>
+    </div>
+  </div>
+  <div class="m-timeline-wrap">
+    <div class="m-tl-label">Tracé du barathon</div>
+    <div class="m-timeline" id="mTimeline">
+      <div class="m-timeline-filled" id="mTimelineFilled" style="height:0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+
+<div id="celebration">
+  <div class="cel-emoji" id="celEmoji">🍻</div>
+  <div class="cel-title">Check-in <span>validé !</span></div>
+  <div class="cel-next-label">Prochain stop — appuie pour Maps</div>
+  <a class="cel-next-name" id="celNextName" href="#">—</a>
+  <button class="cel-btn" onclick="closeCel()">On y va →</button>
+</div>
+
+<!-- FINISH -->
+
+<div id="finish">
+  <div class="fin-trophy">🏆</div>
+  <div class="fin-title">Barathon<br><span>terminé !</span></div>
+  <div class="fin-sub">Tu as survécu à</div>
+  <div class="fin-count" id="finCount">7</div>
+  <div class="fin-count-label">bars à Cusco 🍺</div>
+  <div class="fin-time" id="finTime">Temps : <strong>—</strong></div>
+  <button class="restart-btn" onclick="restart()">Recommencer</button>
+</div>
+
+<script>
+const BARS = [
+  { name: "ViewHouse Resto Bar",  lat: -13.5156, lng: -71.9785 },
+  { name: "Black Cat Bar",        lat: -13.5166, lng: -71.9784 },
+  { name: "Molly's Irish Bar",    lat: -13.5161, lng: -71.9787 },
+  { name: "Paddy's Irish Pub",    lat: -13.5163, lng: -71.9783 },
+  { name: "7 Vidas Taproom",      lat: -13.5170, lng: -71.9790 },
+  { name: "Ukukus Club",          lat: -13.5168, lng: -71.9786 },
+  { name: "Chango Club Cuzco",    lat: -13.5171, lng: -71.9793 },
+];
+
+let bars = [];
+let currentIndex = 0;
+let completedCount = 0;
+let startTime = null;
+let timerInterval = null;
+
+window.onload = () => {
+  bars = BARS.map((b, i) => ({ ...b, id: i }));
+  renderSetup();
+};
+
+function mapsUrl(i) {
+  const b = bars[i];
+  return `https://maps.google.com/?q=${b.lat},${b.lng}`;
+}
+
+/* SETUP */
+function addBar() {
+  bars.push({ id: bars.length, name: '', lat: -13.516, lng: -71.979 });
+  renderSetup();
+}
+
+function removeBar(id) {
+  if (bars.length <= 1) return;
+  bars = bars.filter(b => b.id !== id);
+  bars.forEach((b, i) => b.id = i);
+  renderSetup();
+}
+
+function renderSetup() {
+  const tl = document.getElementById('setupTimeline');
+  tl.innerHTML = '';
+  bars.forEach((bar, i) => {
+    const item = document.createElement('div');
+    item.className = 'setup-item' + (bar.name ? ' filled' : '');
+    item.style.animationDelay = (i * 0.03) + 's';
+    item.innerHTML = `
+      <div class="setup-dot"></div>
+      <div class="setup-row">
+        <span class="setup-num">${String(i+1).padStart(2,'0')}</span>
+        <input type="text" value="${bar.name}" placeholder="Nom du bar..."
+          oninput="bars[${i}].name=this.value.trim();document.getElementById('startBtn').disabled=bars.filter(b=>b.name).length<2;this.closest('.setup-item').className='setup-item'+(this.value?' filled':'')">
+        <button class="del-btn" onclick="removeBar(${bar.id})">×</button>
+      </div>
+    `;
+    tl.appendChild(item);
+  });
+  document.getElementById('startBtn').disabled = bars.filter(b => b.name).length < 2;
+}
+
+/* MARATHON */
+function startMarathon() {
+  bars = bars.filter(b => b.name);
+  if (bars.length < 2) return;
+  currentIndex = 0; completedCount = 0; startTime = Date.now();
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('marathon').style.display = 'flex';
+  timerInterval = setInterval(updateTimer, 1000);
+  renderMarathon();
+}
+
+function renderMarathon() {
+  document.getElementById('mProgCount').innerHTML = `<em>${completedCount}</em>/${bars.length}`;
+  document.getElementById('mProgFill').style.width = `${(completedCount / bars.length) * 100}%`;
+  const bar = bars[currentIndex];
+  document.getElementById('mCardNum').textContent = currentIndex + 1;
+  const nameEl = document.getElementById('mBarName');
+  nameEl.textContent = bar.name;
+  nameEl.onclick = (e) => { e.preventDefault(); window.open(mapsUrl(currentIndex), '_blank'); };
+  const card = document.getElementById('mCard');
+  card.style.animation = 'none'; card.offsetHeight; card.style.animation = 'cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const tl = document.getElementById('mTimeline');
+  const filled = document.getElementById('mTimelineFilled');
+  Array.from(tl.children).forEach(c => { if (c !== filled) c.remove(); });
+
+  bars.forEach((bar, i) => {
+    const item = document.createElement('div');
+    const state = i < currentIndex ? 'done' : i === currentIndex ? 'active' : 'locked';
+    item.className = `m-tl-item ${state}`;
+    const canTap = i <= currentIndex;
+    item.innerHTML = `
+      <div class="m-tl-dot"></div>
+      <div class="m-tl-content">
+        <div class="m-tl-num">STOP ${String(i+1).padStart(2,'0')}</div>
+        <a class="m-tl-name" href="#" ${canTap ? `data-idx="${i}"` : 'style="pointer-events:none"'}>${bar.name}</a>
+      </div>
+    `;
+    if (canTap) {
+      item.querySelector('.m-tl-name').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(mapsUrl(i), '_blank');
+      });
+    }
+    tl.appendChild(item);
+  });
+
+  setTimeout(() => {
+    const items = tl.querySelectorAll('.m-tl-item');
+    if (!items.length || currentIndex === 0) { filled.style.height = '0px'; return; }
+    const tlRect = tl.getBoundingClientRect();
+    const dot = items[currentIndex - 1].querySelector('.m-tl-dot');
+    filled.style.height = (dot.getBoundingClientRect().top - tlRect.top + 7) + 'px';
+  }, 60);
+}
+
+function checkIn() {
+  completedCount++;
+  const isLast = currentIndex === bars.length - 1;
+  if (isLast) {
+    launchConfetti();
+    setTimeout(() => {
+      clearInterval(timerInterval);
+      document.getElementById('marathon').style.display = 'none';
+      document.getElementById('finish').style.display = 'flex';
+      document.getElementById('finCount').textContent = bars.length;
+      document.getElementById('finTime').innerHTML = `Temps total : <strong>${fmt(Math.floor((Date.now()-startTime)/1000))}</strong>`;
+    }, 500);
+    return;
+  }
+  currentIndex++;
+  renderMarathon();
+  const emojis = ['🍻','🎉','⚡','🔥','💥','🙌','🥂','🎊'];
+  document.getElementById('celEmoji').textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  const cel = document.getElementById('celNextName');
+  cel.textContent = bars[currentIndex].name;
+  cel.onclick = (e) => { e.preventDefault(); window.open(mapsUrl(currentIndex), '_blank'); };
+  document.getElementById('celebration').style.display = 'flex';
+}
+
+function closeCel() { document.getElementById('celebration').style.display = 'none'; }
+
+function updateTimer() {
+  if (startTime) document.getElementById('mTimer').textContent = fmt(Math.floor((Date.now()-startTime)/1000));
+}
+
+function fmt(s) {
+  const p = n => String(n).padStart(2,'0');
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return h > 0 ? `${p(h)}:${p(m)}:${p(sec)}` : `${p(m)}:${p(sec)}`;
+}
+
+function launchConfetti() {
+  const colors = ['#f0c040','#e87040','#70c8f0','#f070a0','#90d870','#ffffff'];
+  for (let i=0;i<70;i++) setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }, i*25);
+}
+
+function restart() {
+  clearInterval(timerInterval);
+  bars = BARS.map((b,i) => ({...b,id:i}));
+  currentIndex=0; completedCount=0; startTime=null;
+  document.getElementById('finish').style.display='none';
+  document.getElementById('setup').style.display='flex';
+  renderSetup();
+}
+</script>
+
+</body>
+</html>
